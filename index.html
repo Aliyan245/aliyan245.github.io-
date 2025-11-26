@@ -1,0 +1,129 @@
+<!doctype html>
+‎<html lang="en">
+‎<head>
+‎  <meta charset="utf-8" />
+‎  <meta name="viewport" content="width=device-width, initial-scale=1" />
+‎  <title>Aliyan's Collections - Dropshipping Store</title>
+‎  <style>
+‎    body{font-family:Arial,Helvetica,sans-serif;background:#f7f7fb;color:#111;padding:18px;}
+‎    .container{max-width:980px;margin:0 auto}
+‎    header{display:flex;justify-content:space-between;align-items:center}
+‎    header h1{font-size:20px}
+‎    .search{margin:12px 0}
+‎    .products{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+‎    .card{background:#fff;padding:12px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06)}
+‎    .card img{width:100%;height:140px;object-fit:cover;border-radius:6px}
+‎    .btn{display:inline-block;padding:8px 12px;border-radius:8px;background:#2b6efd;color:white;text-decoration:none;cursor:pointer}
+‎    .muted{color:#666;font-size:13px}
+‎    form{background:#fff;padding:12px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.06);margin-top:12px}
+‎    label{display:block;margin-top:8px;font-weight:600}
+‎    input[type=text], input[type=tel], textarea, select{width:100%;padding:8px;margin-top:6px;border:1px solid #ddd;border-radius:6px}
+‎    input[type=file]{margin-top:6px}
+‎    .row{display:flex;gap:8px}
+‎    .row > *{flex:1}
+‎    footer{margin-top:18px;color:#444}
+‎    .whatsapp{position:fixed;right:18px;bottom:18px;background:#25D366;border-radius:50%;width:60px;height:60px;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 18px rgba(0,0,0,.15)}
+‎    .whatsapp a{color:white;text-decoration:none;font-weight:700}
+‎    .admin-list{margin-top:12px}
+‎    .order{background:#fff;padding:10px;border-radius:8px;margin-bottom:10px}
+‎    .small{font-size:13px;color:#555}
+‎  </style>
+‎</head>
+‎<body>
+‎<div class="container">
+‎<header>
+‎<h1>Aliyan's Collections</h1>
+‎<div class="muted">Call/WhatsApp: <strong>03306741411</strong></div>
+‎</header>
+‎
+‎<div class="search">
+‎<input id="searchInput" placeholder="Search products" />
+‎</div>
+‎
+‎<div id="products" class="products"></div>
+‎
+‎<form id="orderForm">
+‎<h3>Order Form</h3>
+‎<p class="small">Submit order and we will notify you on WhatsApp.</p>
+‎
+‎<label>Customer Name</label>
+‎<input id="custName" type="text" required />
+‎
+‎<label>Phone</label>
+‎<input id="custPhone" type="tel" required />
+‎
+‎<label>Address</label>
+‎<textarea id="custAddress" rows="3" required></textarea>
+‎
+‎<div class="row">
+‎<div>
+‎<label>Product</label>
+‎<select id="productSelect"></select>
+‎</div>
+‎<div>
+‎<label>Quantity</label>
+‎<input id="qty" type="text" value="1" />
+‎</div>
+‎</div>
+‎
+‎<label>Attach Image (product/selfie)</label>
+‎<input id="imageFile" type="file" accept="image/*" />
+‎
+‎<div style="margin-top:10px">
+‎<button class="btn" type="submit">Place Order</button>
+‎</div>
+‎<div id="orderStatus" style="margin-top:10px"></div>
+‎</form>
+‎
+‎<div style="margin-top:12px">
+‎<button id="openAdmin" class="btn">Open Admin Orders</button>
+‎<div id="adminView" style="display:none" class="admin-list"></div>
+‎</div>
+‎
+‎<footer>
+‎<p>Aliyan's Collections - Lahore, Bahria Town. Drop shipping store.</p>
+‎</footer>
+‎</div>
+‎
+‎<div class="whatsapp" title="WhatsApp">
+‎<a href="https://wa.me/03306741411" target="_blank">WA</a>
+‎</div>
+‎
+‎<script type="module">
+‎import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+‎import { getFirestore, collection, addDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+‎import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-storage.js";
+‎
+‎// Your Firebase config
+‎const firebaseConfig = {
+‎  apiKey: "AIzaSyBGPIlez4er3rhn0R7Ymk_ljwr0LGxzgAs",
+‎  authDomain: "aliyan-s-collections-f9739.firebaseapp.com",
+‎  projectId: "aliyan-s-collections-f9739",
+‎  storageBucket: "aliyan-s-collections-f9739.appspot.com",
+‎  messagingSenderId: "544498763042",
+‎  appId: "1:544498763042:web:7dc3e645a21aebc0a6517b"
+‎};
+‎const app = initializeApp(firebaseConfig);
+‎const db = getFirestore(app);
+‎const storage = getStorage(app);
+‎
+‎// Sample products
+‎const products = [
+‎  { name: "Perfume", price: 1200, img: "https://via.placeholder.com/150?text=Perfume" },
+‎  { name: "Smart Watch", price: 2500, img: "https://via.placeholder.com/150?text=Smart+Watch" },
+‎  { name: "Clothes", price: 1800, img: "https://via.placeholder.com/150?text=Clothes" },
+‎  { name: "Tattoo Kit", price: 900, img: "https://via.placeholder.com/150?text=Tattoo+Kit" }
+‎];
+‎
+‎const productsDiv = document.getElementById('products');
+‎const productSelect = document.getElementById('productSelect');
+‎
+‎products.forEach(p => {
+‎  const div = document.createElement('div');
+‎  div.className = 'card';
+‎  div.innerHTML = `<img src='${p.img}' /><h4>${p.name}</h4><p>Price: ${p.price}</p>`;
+‎  productsDiv.appendChild(div);
+‎
+‎  const opt = document.createElement('option');
+‎  opt.value = p.name;
+‎  opt.innerText = p.n
